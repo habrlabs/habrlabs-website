@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80">
+  <!-- Logo mark -->
+  <rect x="0" y="12" width="56" height="56" fill="#0a0a0a"/>
+  <rect x="2" y="14" width="52" height="52" fill="none" stroke="#ffffff" stroke-width="2"/>
+  <text x="28" y="52" font-family="monospace" font-size="32" font-weight="700" fill="#ffffff" text-anchor="middle">H</text>
+  
+  <!-- Wordmark -->
+  <text x="76" y="52" font-family="monospace" font-size="24" font-weight="700" letter-spacing="4" fill="#ffffff">HABR LABS</text>
+</svg>
