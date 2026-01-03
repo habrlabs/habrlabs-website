@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HABR Labs | Innovation Studio</title>
+    <meta name="description" content="HABR Labs is an innovation studio building at the intersection of AI, hardware, and human experience.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --bg-elevated: #111111;
+            --text: #ffffff;
+            --text-secondary: rgba(255,255,255,0.5);
+            --text-tertiary: rgba(255,255,255,0.25);
+            --accent: #ffffff;
+            --border: rgba(255,255,255,0.08);
+            --border-hover: rgba(255,255,255,0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+        
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            z-index: 9999;
+        }
+        
+        /* Subtle gradient accent */
+        .gradient-bg {
+            position: fixed;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.015) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 24px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10,10,10,0.8);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text);
+        }
+        
+        .nav-contact {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-contact:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+        
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 140px 48px 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            max-width: 900px;
+        }
+        
+        .hero-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            color: var(--text-tertiary);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+        }
+        
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 80px);
+            font-weight: 300;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 em {
+            font-style: italic;
+            font-weight: 300;
+        }
+        
+        .hero-description {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 48px;
+            left: 48px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+        }
+        
+        .scroll-line {
+            width: 48px;
+            height: 1px;
+            background: var(--text-tertiary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--text);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes scrollPulse {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        
+        /* Sections */
+        section {
+            padding: 120px 48px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 80px;
+            max-width: 1200px;
+        }
+        
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            padding-top: 8px;
+        }
+        
+        .section-number {
+            display: block;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+        
+        /* About */
+        .about-content h2 {
+            font-size: 32px;
+            font-weight: 400;
+            line-height: 1.4;
+            margin-bottom: 32px;
+            letter-spacing: -0.01em;
+        }
+        
+        .about-content p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 640px;
+            font-weight: 300;
+        }
+        
+        .about-content p + p {
+            margin-top: 24px;
+        }
+        
+        /* Focus Areas */
+        .focus-section {
+            border-top: 1px solid var(--border);
+        }
+        
+        .focus-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            margin-top: 60px;
+        }
+        
+        .focus-item {
+            background: var(--bg);
+            padding: 48px 40px;
+            transition: background 0.3s ease;
+        }
+        
+        .focus-item:hover {
+            background: var(--bg-elevated);
+        }
+        
+        .focus-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.1em;
+            margin-bottom: 24px;
+        }
+        
+        .focus-item h3 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+        }
+        
+        .focus-item p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+        
+        /* Approach */
+        .approach-section {
+            border-top: 1px solid var(--border);
+        }
+        
+        .approach-content {
+            max-width: 640px;
+        }
+        
+        .approach-content h2 {
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.4;
+            margin-bottom: 40px;
+        }
+        
+        .approach-list {
+            list-style: none;
+        }
+        
+        .approach-list li {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 24px;
+            align-items: baseline;
+        }
+        
+        .approach-list li:first-child {
+            border-top: 1px solid var(--border);
+        }
+        
+        .approach-list span {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+            width: 24px;
+        }
+        
+        .approach-list p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        
+        /* Contact */
+        .contact-section {
+            border-top: 1px solid var(--border);
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .contact-content {
+            max-width: 640px;
+        }
+        
+        .contact-content h2 {
+            font-size: 42px;
+            font-weight: 300;
+            line-height: 1.3;
+            margin-bottom: 40px;
+            letter-spacing: -0.02em;
+        }
+        
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--text);
+            transition: all 0.2s ease;
+        }
+        
+        .contact-email:hover {
+            gap: 24px;
+        }
+        
+        .contact-email svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+        
+        .contact-email:hover svg {
+            transform: translateX(4px);
+        }
+        
+        /* Footer */
+        footer {
+            padding: 48px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-left {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.05em;
+        }
+        
+        .footer-right {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .footer-right a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 24px;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-right a:hover {
+            color: var(--text);
+        }
+        
+        /* Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.8s ease forwards;
+        }
+        
+        .fade-up:nth-child(1) { animation-delay: 0.1s; }
+        .fade-up:nth-child(2) { animation-delay: 0.2s; }
+        .fade-up:nth-child(3) { animation-delay: 0.3s; }
+        .fade-up:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .section-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .focus-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 24px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 120px 24px 60px;
+            }
+            
+            section {
+                padding: 80px 24px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .scroll-indicator {
+                display: none;
+            }
+            
+            footer {
+                flex-direction: column;
+                gap: 24px;
+                text-align: center;
+                padding: 40px 24px;
+            }
+            
+            .footer-right a {
+                margin: 0 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <nav>
+        <a href="#" class="logo">
+            <div class="logo-mark">H</div>
+            HABR LABS
+        </a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#focus">Focus</a></li>
+            <li><a href="#approach">Approach</a></li>
+        </ul>
+        <a href="#contact" class="nav-contact">Get in Touch</a>
+    </nav>
+    
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <p class="hero-label fade-up">Innovation Studio</p>
+                <h1 class="fade-up">Building at the intersection of <em>AI</em>, hardware, and physical experience.</h1>
+                <p class="hero-description fade-up">We design and build intelligent hardware products that bring AI into the physical world.</p>
+            </div>
+            <div class="scroll-indicator">
+                <div class="scroll-line"></div>
+                Scroll
+            </div>
+        </section>
+        
+        <section id="about" class="about-section">
+            <div class="section-grid">
+                <div class="section-label">
+                    <span class="section-number">01</span>
+                    About
+                </div>
+                <div class="about-content">
+                    <h2>We create technology that lives in the physical world.</h2>
+                    <p>HABR Labs is an innovation studio specializing in AI-powered hardware and physical products. We design, prototype, and build intelligent devices that feel intuitive and human.</p>
+                    <p>Our work spans industrial design, embedded systems, and production-ready hardware. We move from concept to working product with precision and speed.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="focus" class="focus-section">
+            <div class="section-grid">
+                <div class="section-label">
+                    <span class="section-number">02</span>
+                    Focus Areas
+                </div>
+                <div></div>
+            </div>
+            <div class="focus-grid">
+                <div class="focus-item">
+                    <p class="focus-number">01</p>
+                    <h3>Smart Hardware</h3>
+                    <p>AI-powered physical devices that adapt to user behavior and environment. Embedded systems, sensors, and real-time intelligence.</p>
+                </div>
+                <div class="focus-item">
+                    <p class="focus-number">02</p>
+                    <h3>Computer Vision</h3>
+                    <p>Visual AI systems for physical spaces. Object recognition, spatial computing, and intelligent display technologies.</p>
+                </div>
+                <div class="focus-item">
+                    <p class="focus-number">03</p>
+                    <h3>Rapid Prototyping</h3>
+                    <p>From concept to working hardware in weeks, not months. We validate ideas quickly through iterative development and real-world testing.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="approach" class="approach-section">
+            <div class="section-grid">
+                <div class="section-label">
+                    <span class="section-number">03</span>
+                    Approach
+                </div>
+                <div class="approach-content">
+                    <h2>How we work</h2>
+                    <ul class="approach-list">
+                        <li>
+                            <span>01</span>
+                            <p>Start with the physical experience, then work backward to the technology required to enable it.</p>
+                        </li>
+                        <li>
+                            <span>02</span>
+                            <p>Build working prototypes early. Real feedback from real users beats assumptions every time.</p>
+                        </li>
+                        <li>
+                            <span>03</span>
+                            <p>Integrate AI where it matters. Intelligence should enhance the product, not complicate it.</p>
+                        </li>
+                        <li>
+                            <span>04</span>
+                            <p>Design for manufacturing. Prototypes are meaningless without a path to production.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="contact-section">
+            <div class="section-grid">
+                <div class="section-label">
+                    <span class="section-number">04</span>
+                    Contact
+                </div>
+                <div class="contact-content">
+                    <h2>Have a project in mind? Let's talk.</h2>
+                    <a href="/cdn-cgi/l/email-protection#9bf3fef7f7f4dbf3faf9e9f7faf9e8b5f8f4f6" class="contact-email">
+                        <span class="__cf_email__" data-cfemail="b9d1dcd5d5d6f9d1d8dbcbd5d8dbca97dad6d4">[email&#160;protected]</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-left">
+            © 2026 HABR Asset Management LLC
+        </div>
+        <div class="footer-right">
+            <a href="/cdn-cgi/l/email-prot
