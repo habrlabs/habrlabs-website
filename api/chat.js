@@ -79,8 +79,7 @@ RULES:
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', response.status, errorText);
+      console.error('Anthropic API error:', response.status);
       return res.status(500).json({ error: 'AI service error' });
     }
 
@@ -102,11 +101,11 @@ RULES:
         if (leadData.email && leadData.email.includes('@')) {
           console.log('Sending notification...');
           
-          fetch('https://habrlabs.com/api/notify', {
+          await fetch('https://habrlabs.com/api/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lead: leadData })
-          }).catch(err => console.error('Notify error:', err));
+          });
         }
         
       } catch (e) {
