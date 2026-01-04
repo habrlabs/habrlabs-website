@@ -101,29 +101,27 @@ RULES:
     const leadMatch = reply.match(/\|\|\|LEAD_DATA\|\|\|([\s\S]*?)\|\|\|END_LEAD\|\|\|/);
     
     if (leadMatch) {
-      // Remove the lead data from visible reply
       reply = reply.replace(/\|\|\|LEAD_DATA\|\|\|[\s\S]*?\|\|\|END_LEAD\|\|\|/, '').trim();
       
       try {
         const leadData = JSON.parse(leadMatch[1]);
+        console.log('LEAD CAPTURED:', JSON.stringify(leadData));
         
-        // If score is 6 or higher, notify
         if (leadData.score >= 6) {
-          const baseUrl = process.env.VERCEL_URL 
-            ? `https://${process.env.VERCEL_URL}` 
-            : 'https://habrlabs.com';
+          console.log('Sending notification for hot lead...');
           
-          fetch(`${baseUrl}/api/notify`, {
+          const notifyResponse = await fetch('https://habrlabs.com/api/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lead: leadData })
-          }).catch(err => console.error('Notify failed:', err));
+          });
+          
+          const notifyResult = await notifyResponse.text();
+          console.log('Notify status:', notifyResponse.status, notifyResult);
         }
         
-        console.log('LEAD CAPTURED:', JSON.stringify(leadData));
-        
       } catch (e) {
-        console.error('Failed to parse lead data:', e);
+        console.error('Lead processing error:', e);
       }
     }
 
