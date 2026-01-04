@@ -9,6 +9,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'No lead data' });
   }
 
+  const timestamp = new Date().toLocaleString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true 
+  });
+
+  const projectSnippet = lead.project 
+    ? lead.project.substring(0, 30) + (lead.project.length > 30 ? '...' : '')
+    : 'New Inquiry';
+
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -19,19 +31,43 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         from: 'HABR Labs <notifications@habrlabs.com>',
         to: 'hello@habrlabs.com',
-        subject: `🔥 Hot Lead: ${lead.name || 'New Inquiry'}`,
+        subject: `Lead [${lead.score}/12]: ${projectSnippet} — ${timestamp}`,
         html: `
-          <h2>New Qualified Lead</h2>
-          <p><strong>Name:</strong> ${lead.name || 'Not provided'}</p>
-          <p><strong>Email:</strong> ${lead.email || 'Not provided'}</p>
-          <p><strong>Company:</strong> ${lead.company || 'Not provided'}</p>
-          <p><strong>Project:</strong> ${lead.project || 'Not provided'}</p>
-          <p><strong>Budget:</strong> ${lead.budget || 'Not provided'}</p>
-          <p><strong>Timeline:</strong> ${lead.timeline || 'Not provided'}</p>
-          <p><strong>Score:</strong> ${lead.score}/10</p>
-          <hr>
-          <p><strong>Conversation Summary:</strong></p>
-          <p>${lead.summary || 'No summary'}</p>
+          <div style="font-family: -apple-system, sans-serif; max-width: 600px;">
+            <h2 style="margin-bottom: 24px;">New Lead — Score: ${lead.score}/12</h2>
+            
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; color: #666; width: 100px;">Email</td>
+                <td style="padding: 8px 0;"><strong>${lead.email || 'Not provided'}</strong></td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #666;">Company</td>
+                <td style="padding: 8px 0;">${lead.company || 'Not provided'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #666;">Project</td>
+                <td style="padding: 8px 0;">${lead.project || 'Not provided'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #666;">Budget</td>
+                <td style="padding: 8px 0;">${lead.budget || 'Not provided'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #666;">Timeline</td>
+                <td style="padding: 8px 0;">${lead.timeline || 'Not provided'}</td>
+              </tr>
+            </table>
+            
+            <div style="margin-top: 24px; padding: 16px; background: #f5f5f5; border-radius: 8px;">
+              <strong>Summary:</strong><br>
+              ${lead.summary || 'No summary'}
+            </div>
+            
+            <p style="margin-top: 24px;">
+              <a href="mailto:${lead.email}" style="background: #0a0a0a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Reply to Lead</a>
+            </p>
+          </div>
         `
       })
     });
