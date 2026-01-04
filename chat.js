@@ -10,7 +10,6 @@ const MAX_REQUESTS_PER_WINDOW = 10; // 10 messages per minute per IP
 const ALLOWED_ORIGINS = [
   'https://habrlabs.com',
   'https://www.habrlabs.com',
-  'http://localhost:3000', // Remove in production if not needed
 ];
 
 function getClientIP(req) {
