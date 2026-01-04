@@ -22,7 +22,8 @@ export default async function handler(req, res) {
     : 'New Inquiry';
 
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    // 1. Notify you
+    await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
@@ -72,9 +73,63 @@ export default async function handler(req, res) {
       })
     });
 
-    if (!response.ok) {
-      console.error('Resend error:', await response.text());
-      return res.status(500).json({ error: 'Email failed' });
+    // 2. Auto-reply to lead
+    if (lead.email && lead.email.includes('@')) {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'HABR Labs <hello@habrlabs.com>',
+          to: lead.email,
+          subject: 'Thanks for reaching out — HABR Labs',
+          html: `
+            <div style="font-family: -apple-system, sans-serif; max-width: 600px;">
+              <p>Hi${lead.name ? ` ${lead.name}` : ''},</p>
+              
+              <p>Thanks for your interest in HABR Labs. We received your inquiry and will be in touch within 24 hours.</p>
+              
+              <p><strong>What you shared:</strong></p>
+              <ul style="color: #666;">
+                <li>Project: ${lead.project || 'To be discussed'}</li>
+                <li>Timeline: ${lead.timeline || 'To be discussed'}</li>
+                <li>Budget: ${lead.budget || 'To be discussed'}</li>
+              </ul>
+              
+              <p>If you have any additional details to share, feel free to reply to this email.</p>
+              
+              <p>Talk soon,<br>
+              <strong>HABR Labs</strong></p>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+              <p style="font-size: 12px; color: #999;">
+                HABR Labs — Hardware innovation studio<br>
+                hello@habrlabs.com • habrlabs.com
+              </p>
+            </div>
+          `
+        })
+      });
+    }
+
+    // 3. Log to Google Sheet (we'll add this next)
+    if (process.env.GOOGLE_SHEET_WEBHOOK) {
+      await fetch(process.env.GOOGLE_SHEET_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          email: lead.email,
+          company: lead.company,
+          project: lead.project,
+          budget: lead.budget,
+          timeline: lead.timeline,
+          score: lead.score,
+          summary: lead.summary
+        })
+      }).catch(err => console.error('Sheet logging error:', err));
     }
 
     return res.status(200).json({ success: true });
