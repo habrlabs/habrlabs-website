@@ -49,7 +49,7 @@ LEAD SCORING (internal, never mention to user):
 - Wants free advice only: LOW
 
 WHEN YOU HAVE ENOUGH INFO:
-After collecting name, email, and project details, include this JSON block at the very end of your response (user won't see it processed):
+After collecting project details AND email, include this JSON block at the very end of your response (user won't see it):
 
 |||LEAD_DATA|||
 {"name": "", "email": "", "company": "", "project": "", "budget": "", "timeline": "", "score": 0, "summary": ""}
@@ -109,14 +109,17 @@ RULES:
         
         // If score is 6 or higher, notify
         if (leadData.score >= 6) {
-          fetch(`${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : ''}/api/notify`, {
+          const baseUrl = process.env.VERCEL_URL 
+            ? `https://${process.env.VERCEL_URL}` 
+            : 'https://habrlabs.com';
+          
+          fetch(`${baseUrl}/api/notify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lead: leadData })
           }).catch(err => console.error('Notify failed:', err));
         }
         
-        // Log all leads (you can connect to Google Sheets later)
         console.log('LEAD CAPTURED:', JSON.stringify(leadData));
         
       } catch (e) {
